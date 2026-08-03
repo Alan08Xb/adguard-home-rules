@@ -16,35 +16,40 @@ jobs:
       - name: 下载代码
         uses: actions/checkout@v4
 
-      - name: 下载并合并规则
+- name: 下载并合并规则
         run: |
-          # 初始化
           > temp_rules.txt
           rule_sources=0
+          valid_sources=0
           total_raw=0
           
           echo "========================================"
           echo "  开始下载规则源"
           echo "========================================"
           
-          # 从 sources.txt 读取规则源
           while IFS= read -r url; do
-            # 跳过注释行和空行
             if [[ ! "$url" =~ ^[[:space:]]*# ]] && [[ -n "$url" ]]; then
               rule_sources=$((rule_sources + 1))
               echo ""
               echo "📥 [$rule_sources] 下载: $url"
               
-              # 下载规则
               if curl -sS --retry 3 --connect-timeout 30 "$url" -o temp_download.txt; then
+                # 检测是否为 HTML（404页面或无效源）
+                first_line=$(head -1 temp_download.txt)
+                if echo "$first_line" | grep -qiE '<!doctype|<html|<head|<body|<title|<meta'; then
+                  echo "   ⚠️  返回HTML，可能是404或无效源，跳过"
+                  rm -f temp_download.txt
+                  continue
+                fi
+                
                 download_count=$(wc -l < temp_download.txt)
                 total_raw=$((total_raw + download_count))
+                valid_sources=$((valid_sources + 1))
                 echo "   ✅ 成功: $download_count 条"
                 
-                # 追加到临时文件
                 cat temp_download.txt >> temp_rules.txt
               else
-                echo "   ❌ 下载失败，跳过此源"
+                echo "   ❌ 下载失败，跳过"
               fi
               rm -f temp_download.txt
             fi
@@ -54,61 +59,51 @@ jobs:
           echo "========================================"
           echo "  处理规则"
           echo "========================================"
+          echo "📊 有效规则源: $valid_sources/$rule_sources"
           
-          # 原始总数（包含注释空行）
-          total_with_comments=$(wc -l < temp_rules.txt)
-          echo "📊 下载总量(含注释): $total_with_comments"
+          total_before=$(wc -l < temp_rules.txt)
+          echo "📊 下载总量(含注释空行): $total_before"
           
-          # 去注释、去空行、去重
+          # 过滤：去注释、去空行、去HTML、去CSS、去JS
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
-          grep -v '^/' | \
+          grep -vE '<[a-zA-Z/]' | \
+          grep -vE '[{}]' | \
+          grep -vE '^[[:space:]]*[.@#]' | \
+          grep -vE 'font-|margin|padding|color|background|display|text-' | \
           sed 's/[[:space:]]*$//' | \
           sort -u > merged-rules.txt
           
-          # 统计数据
           final_count=$(wc -l < merged-rules.txt)
-          removed=$((total_with_comments - final_count))
+          removed=$((total_before - final_count))
           
-          echo "📊 有效规则提取: $total_with_comments"
+          echo "📊 有效规则提取: $total_before"
           echo "🗑️  去除无效/重复: $removed"
           echo "✅ 最终规则总数: $final_count"
           
-          echo ""
-          echo "========================================"
-          echo "  生成规则文件"
-          echo "========================================"
-          
-          # 生成带详细信息的头部
+          # 生成最终文件
           {
             echo "! =========================================="
             echo "! Title: 聚合广告过滤规则"
             echo "! =========================================="
             echo "! 更新时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') (北京时间)"
-            echo "! 规则来源数: $rule_sources 个"
-            echo "! 下载总量: $total_with_comments 条 (含注释空行)"
-            echo "! 有效规则: $total_with_comments 条"
+            echo "! 规则来源: $valid_sources 个（共 $rule_sources 个源，$((rule_sources - valid_sources)) 个失效）"
+            echo "! 下载总量: $total_before 条"
             echo "! 去重后总数: $final_count 条"
             echo "! 去除无效/重复: $removed 条"
             echo "! =========================================="
             echo "!"
-            echo "! 规则来源列表:"
-            
-            # 列出规则源
+            echo "! 有效规则来源:"
             while IFS= read -r url; do
               if [[ ! "$url" =~ ^[[:space:]]*# ]] && [[ -n "$url" ]]; then
-                echo "!   - $url"
+                echo "!   ✅ $url"
               fi
             done < sources.txt
-            
             echo "! =========================================="
             echo ""
           } > rules.txt
           
-          # 追加去重后的规则
           cat merged-rules.txt >> rules.txt
-          
-          # 清理
           rm -f temp_rules.txt merged-rules.txt
           
           echo ""
