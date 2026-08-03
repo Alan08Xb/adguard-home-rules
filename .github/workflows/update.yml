@@ -29,17 +29,8 @@ jobs:
           else
             # 如果没有 sources.txt，使用默认规则源
           curl -s "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" >> temp_rules.txt
-          curl -s "https://big.oisd.nl/" >> temp_rules.txt
-          curl -s "https://raw.githubusercontent.com/Cats-Team/AdRules/main/dns.txt" >> temp_rules.txt
           curl -s "https://anti-ad.net/easylist.txt" >> temp_rules.txt
-          curl -s "https://easylist-downloads.adblockplus.org/easyprivacy.txt" >> temp_rules.txt
-          curl -s "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt" >> temp_rules.txt
-          curl -s "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/annoyances.txt" >> temp_rules.txt
-          curl -s "https://adrules.top/dns.txt" >> temp_rules.txt
-          curl -s "https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-ublock.txt" >> temp_rules.txt
-          curl -s "https://raw.githubusercontent.com/jdlingyu/ad-wars/master/hosts" >> temp_rules.txt
-          curl -s "https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/mv.txt" >> temp_rules.txt
-          curl -s "https://easylist-downloads.adblockplus.org/easylist-cookie.txt" >> temp_rules.txt
+          curl -s "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/ChineseFilter/sections/adservers.txt" >> temp_rules.txt
           fi
           
           # 统计
