@@ -89,6 +89,15 @@ jobs:
             echo "! 去重后总数: $final_count 条"
             echo "! 移除无效/重复: $removed 条"
             echo "! =========================================="
+            echo "!"
+            echo "! 规则来源列表:"
+            while IFS= read -r line; do
+              if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
+                url_clean=$(echo "$line" | tr -d '[:space:]')
+                echo "!   - $url_clean"
+              fi
+            done < sources.txt
+            echo "! =========================================="
             echo ""
           } > rules.txt
           
