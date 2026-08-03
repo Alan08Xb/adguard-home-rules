@@ -1,0 +1,84 @@
+name: 自动更新规则
+
+on:
+  schedule:
+    - cron: '0 0,12 * *'  # UTC 0点和12点 = 北京时间8点和20点
+  workflow_dispatch:  # 手动运行
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 下载代码
+        uses: actions/checkout@v3
+
+      - name: 下载并合并规则
+        run: |
+          > temp_rules.txt
+          
+          echo "📥 开始下载规则源..."
+          
+          # 从 sources.txt 读取规则源
+          if [ -f sources.txt ]; then
+            while IFS= read -r url; do
+              if [[ ! "$url" =~ ^#.* ]] && [[ -n "$url" ]]; then
+                echo "⬇️  下载: $url"
+                curl -s --retry 3 "$url" >> temp_rules.txt || echo "❌ 下载失败"
+              fi
+            done < sources.txt
+          else
+            # 如果没有 sources.txt，使用默认规则源
+          curl -s "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt" >> temp_rules.txt
+          curl -s "https://big.oisd.nl/" >> temp_rules.txt
+          curl -s "https://raw.githubusercontent.com/Cats-Team/AdRules/main/dns.txt" >> temp_rules.txt
+          curl -s "https://anti-ad.net/easylist.txt" >> temp_rules.txt
+          curl -s "https://easylist-downloads.adblockplus.org/easyprivacy.txt" >> temp_rules.txt
+          curl -s "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt" >> temp_rules.txt
+          curl -s "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/annoyances.txt" >> temp_rules.txt
+          curl -s "https://adrules.top/dns.txt" >> temp_rules.txt
+          curl -s "https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-ublock.txt" >> temp_rules.txt
+          curl -s "https://raw.githubusercontent.com/jdlingyu/ad-wars/master/hosts" >> temp_rules.txt
+          curl -s "https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/mv.txt" >> temp_rules.txt
+          curl -s "https://easylist-downloads.adblockplus.org/easylist-cookie.txt" >> temp_rules.txt
+          fi
+          
+          # 统计
+          raw_count=$(wc -l < temp_rules.txt)
+          echo "📊 原始规则总数: $raw_count"
+          
+          # 清理和去重
+          grep -v '^[!！#]' temp_rules.txt | \
+          grep -v '^$' | \
+          sed 's/[[:space:]]*$//' | \
+          sort -u > merged-rules.txt
+          
+          # 统计结果
+          final_count=$(wc -l < merged-rules.txt)
+          removed=$((raw_count - final_count))
+          
+          echo "✅ 去重后规则: $final_count"
+          echo "🗑️  移除重复: $removed ($(awk "BEGIN {printf \"%.1f\", $removed/$raw_count*100}")%)"
+          
+          # 生成最终文件
+          {
+            echo "! Title: 聚合广告过滤规则"
+            echo "! 更新时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')"
+            echo "! 原始规则数: $raw_count"
+            echo "! 去重后规则: $final_count"
+            echo "! 去重率: $(awk "BEGIN {printf \"%.1f\", $removed/$raw_count*100}")%"
+            echo ""
+          } > rules.txt
+          
+          cat merged-rules.txt >> rules.txt
+          
+          # 清理临时文件
+          rm -f temp_rules.txt merged-rules.txt
+
+      - name: 保存更新
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add rules.txt
+          git diff --quiet && git diff --staged --quiet || \
+            git commit -m "🔄 更新规则 - $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')"
+          git push
