@@ -16,7 +16,7 @@ jobs:
       - name: 下载代码
         uses: actions/checkout@v4
 
-- name: 下载并合并规则
+      - name: 下载并合并规则
         run: |
           > temp_rules.txt
           rule_sources=0
@@ -28,16 +28,16 @@ jobs:
           echo "========================================"
           
           while IFS= read -r url; do
-            if [[ ! "$url" =~ ^[[:space:]]*# ]] && [[ -n "$url" ]]; then
+            if echo "$url" | grep -qv '^#' && [ -n "$url" ]; then
+              url=$(echo "$url" | tr -d '[:space:]')
               rule_sources=$((rule_sources + 1))
               echo ""
-              echo "📥 [$rule_sources] 下载: $url"
+              echo "[$rule_sources] 下载: $url"
               
-              if curl -sS --retry 3 --connect-timeout 30 "$url" -o temp_download.txt; then
-                # 检测是否为 HTML（404页面或无效源）
+              if curl -sS --retry 3 --connect-timeout 30 "$url" -o temp_download.txt 2>/dev/null; then
                 first_line=$(head -1 temp_download.txt)
                 if echo "$first_line" | grep -qiE '<!doctype|<html|<head|<body|<title|<meta'; then
-                  echo "   ⚠️  返回HTML，可能是404或无效源，跳过"
+                  echo "   警告: 返回HTML，跳过此源"
                   rm -f temp_download.txt
                   continue
                 fi
@@ -45,11 +45,11 @@ jobs:
                 download_count=$(wc -l < temp_download.txt)
                 total_raw=$((total_raw + download_count))
                 valid_sources=$((valid_sources + 1))
-                echo "   ✅ 成功: $download_count 条"
+                echo "   成功: $download_count 行"
                 
                 cat temp_download.txt >> temp_rules.txt
               else
-                echo "   ❌ 下载失败，跳过"
+                echo "   失败: 无法下载"
               fi
               rm -f temp_download.txt
             fi
@@ -59,12 +59,11 @@ jobs:
           echo "========================================"
           echo "  处理规则"
           echo "========================================"
-          echo "📊 有效规则源: $valid_sources/$rule_sources"
+          echo "有效源: $valid_sources / $rule_sources"
           
           total_before=$(wc -l < temp_rules.txt)
-          echo "📊 下载总量(含注释空行): $total_before"
+          echo "下载总量: $total_before 行"
           
-          # 过滤：去注释、去空行、去HTML、去CSS、去JS
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
@@ -77,28 +76,18 @@ jobs:
           final_count=$(wc -l < merged-rules.txt)
           removed=$((total_before - final_count))
           
-          echo "📊 有效规则提取: $total_before"
-          echo "🗑️  去除无效/重复: $removed"
-          echo "✅ 最终规则总数: $final_count"
+          echo "去重后: $final_count 条"
+          echo "移除: $removed 条"
           
-          # 生成最终文件
           {
             echo "! =========================================="
             echo "! Title: 聚合广告过滤规则"
             echo "! =========================================="
             echo "! 更新时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') (北京时间)"
-            echo "! 规则来源: $valid_sources 个（共 $rule_sources 个源，$((rule_sources - valid_sources)) 个失效）"
+            echo "! 有效规则源: $valid_sources 个"
             echo "! 下载总量: $total_before 条"
             echo "! 去重后总数: $final_count 条"
-            echo "! 去除无效/重复: $removed 条"
-            echo "! =========================================="
-            echo "!"
-            echo "! 有效规则来源:"
-            while IFS= read -r url; do
-              if [[ ! "$url" =~ ^[[:space:]]*# ]] && [[ -n "$url" ]]; then
-                echo "!   ✅ $url"
-              fi
-            done < sources.txt
+            echo "! 移除无效/重复: $removed 条"
             echo "! =========================================="
             echo ""
           } > rules.txt
@@ -107,12 +96,12 @@ jobs:
           rm -f temp_rules.txt merged-rules.txt
           
           echo ""
-          echo "🎉 规则更新完成！"
+          echo "完成!"
 
       - name: 保存并推送
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add rules.txt
-          git diff --quiet && git diff --staged --quiet || git commit -m "🔄 更新规则 - $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')"
+          git diff --quiet && git diff --staged --quiet || git commit -m "更新规则 $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')"
           git push
