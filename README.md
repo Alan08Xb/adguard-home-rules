@@ -1,5 +1,5 @@
 # adguard-home-rules
-AdGuard homel黑名单规则聚合（自用）
+AdGuard homel黑名单规则聚合（自用，实现自动聚合上游规则，自动去重，每12小时更新）
 
 规则来源如下：
 # AdGuard DNS 过滤器
@@ -33,13 +33,10 @@ https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.tx
 https://adguardteam.github.io/AdGuardSDNSFilter/Filters/annoyances.txt
 
 # AdRules DNS List
-https://adrules.top/dns.txt
+https://raw.githubusercontent.com/Cats-Team/AdRules/main/adrules.txt
 
 # CJX's uBlock list
 https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-ublock.txt
-
-# 大圣净化规则
-https://raw.githubusercontent.com/jdlingyu/ad-wars/master/hosts
 
 # 乘风规则
 https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/mv.txt
