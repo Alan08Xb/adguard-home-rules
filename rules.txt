@@ -1,11 +1,29 @@
 ! ==========================================
 ! Title: 聚合广告过滤规则
 ! ==========================================
-! 更新时间: 2026-08-03 17:34:30 (北京时间)
+! 更新时间: 2026-08-03 17:50:05 (北京时间)
 ! 有效规则源: 14 个
 ! 下载总量: 1170347 条
 ! 去重后总数: 711535 条
 ! 移除无效/重复: 458812 条
+! ==========================================
+!
+! 规则来源列表:
+!   - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+!   - https://anti-ad.net/easylist.txt
+!   - https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/ChineseFilter/sections/adservers.txt
+!   - https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/BaseFilter/sections/adservers.txt
+!   - https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/MobileFilter/sections/adservers.txt
+!   - https://big.oisd.nl/
+!   - https://easylist-downloads.adblockplus.org/easyprivacy.txt
+!   - https://raw.githubusercontent.com/Cats-Team/AdRules/main/dns.txt
+!   - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt
+!   - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/annoyances.txt
+!   - https://raw.githubusercontent.com/Cats-Team/AdRules/main/adrules.txt
+!   - https://raw.githubusercontent.com/cjx82630/cjxlist/master/cjx-ublock.txt
+!   - https://raw.githubusercontent.com/xinggsf/Adblock-Plus-Rule/master/mv.txt
+!   - https://raw.githubusercontent.com/zsakvo/AdGuard-Custom-Rule/master/rule/zhihu.txt
+!   - https://raw.githubusercontent.com/banbendalao/ADgk/master/kill-baidu-ad.txt
 ! ==========================================
 
 $csp=child-src 'none'; frame-src 'self' *; worker-src 'none',domain=fileone.tv|theappguruz.com
