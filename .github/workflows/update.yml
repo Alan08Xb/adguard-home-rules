@@ -64,12 +64,17 @@ jobs:
           total_before=$(wc -l < temp_rules.txt)
           echo "下载总量: $total_before 行"
           
+          # 过滤：只保留 DNS 可用的域名规则
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
           grep -vE '[{}]' | \
           grep -vE '^[[:space:]]*[.@#]' | \
           grep -vE 'font-|margin|padding|color|background|display|text-' | \
+          grep -vE '\$[a-z]' | \
+          grep -vE '##|#@#' | \
+          grep -vE 'override-property-read|script:inject|script:contains' | \
+          grep -vE '^\|?https?://' | \
           sed 's/[[:space:]]*$//' | \
           sort -u > merged-rules.txt
           
@@ -81,7 +86,7 @@ jobs:
           
           {
             echo "! =========================================="
-            echo "! Title: 聚合广告过滤规则"
+            echo "! Title: 聚合广告过滤规则 (仅DNS可用规则)"
             echo "! =========================================="
             echo "! 更新时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') (北京时间)"
             echo "! 有效规则源: $valid_sources 个"
