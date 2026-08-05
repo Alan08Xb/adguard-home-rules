@@ -65,13 +65,28 @@ jobs:
           echo "下载总量: $total_before 行"
           
           # ============ 过滤规则 ============
-          # 注意：grep -vE '^[[:space:]]*[.#]' 只过滤 . 和 # 开头
-          # 保留 @ 开头（白名单 @@ 格式）
+          # 保留的格式（AdGuard Home DNS 支持）：
+          #   ||domain^         域名屏蔽
+          #   @@||domain^       白名单
+          #   /regex/           正则表达式
+          #   domain            纯域名
+          #   0.0.0.0 domain    hosts格式
+          #
+          # 过滤掉的内容：
+          #   注释（! # 开头）
+          #   HTML/CSS/JS 代码
+          #   元素隐藏规则（###,##）
+          #   脚本注入规则
+          #   路径片段（& . - / 开头）
+          #   带修饰符的黑名单（$image,$script等）
+          #   但保留白名单中的修饰符（@@开头）
+          #   过滤单@开头（CSS变量等），但保留@@白名单
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
           grep -vE '[{}]' | \
           grep -vE '^[[:space:]]*[.#]' | \
+          grep -vE '^@[^@]' | \
           grep -vE 'font-|margin|padding|color|background|display|text-' | \
           grep -vE '##|#@#' | \
           grep -vE 'override-property-read|script:inject|script:contains|:style|:xpath' | \
@@ -88,11 +103,13 @@ jobs:
           echo "移除: $removed 条"
           
           # ============ 生成文件头部 ============
+          UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          
           {
             echo "! =========================================="
             echo "! Title: 聚合广告过滤规则 (DNS可用)"
             echo "! =========================================="
-            echo "! 更新时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') (北京时间)"
+            echo "! 更新时间: $UPDATE_TIME (北京时间)"
             echo "! 有效规则源: $valid_sources 个"
             echo "! 下载总量: $total_before 条"
             echo "! 去重后总数: $final_count 条"
@@ -193,16 +210,113 @@ jobs:
             cat rules_plain.txt >> rules.txt
           fi
           
+          # 清理临时文件
           rm -f merged-rules.txt temp_rules.txt rules_*.txt
           
           echo ""
-          echo "白名单: $whitelist_count | 域名屏蔽: $domain_count | Hosts: $hosts_count | 正则: $regex_count | 纯域名: $plain_count"
-          echo "完成!"
+          echo "========================================"
+          echo "  统计汇总"
+          echo "========================================"
+          echo "白名单:    $whitelist_count 条"
+          echo "域名屏蔽:  $domain_count 条"
+          echo "Hosts:     $hosts_count 条"
+          echo "正则:      $regex_count 条"
+          echo "纯域名:    $plain_count 条"
+          echo "----------------------------------------"
+          echo "总计:      $final_count 条"
+          echo "========================================"
+          
+          # ============ 更新 README.md ============
+          RULES_URL="https://raw.githubusercontent.com/${{ github.repository }}/main/rules.txt"
+          
+          cat > README.md << EOF
+# 🛡️ AdGuard Home 聚合规则
+
+[![自动更新规则](https://github.com/${{ github.repository }}/actions/workflows/update.yml/badge.svg)](https://github.com/${{ github.repository }}/actions/workflows/update.yml)
+
+## 📋 规则订阅地址
+
+\`\`\`
+$RULES_URL
+\`\`\`
+
+> 将上面的地址添加到 AdGuard Home → 过滤器 → DNS 黑名单 即可。
+
+---
+
+## 📊 当前规则统计
+
+| 类别 | 数量 |
+|------|------|
+| 🟢 白名单规则 | $whitelist_count |
+| 🔴 域名屏蔽规则 | $domain_count |
+| 🟡 Hosts 格式规则 | $hosts_count |
+| 🔵 正则表达式规则 | $regex_count |
+| ⚪ 纯域名规则 | $plain_count |
+| **📌 总计** | **$final_count** |
+
+> 更新时间：$UPDATE_TIME (北京时间)
+
+---
+
+## 🔄 更新频率
+
+每天自动更新两次（北京时间 **8:00** 和 **20:00**）
+
+---
+
+## 📂 规则来源
+
+| # | 规则源 |
+|---|--------|
+EOF
+          
+          source_num=0
+          while IFS= read -r line; do
+            if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
+              source_num=$((source_num + 1))
+              url_clean=$(echo "$line" | tr -d '[:space:]')
+              echo "| $source_num | $url_clean |" >> README.md
+            fi
+          done < sources.txt
+          
+          cat >> README.md << EOF
+
+---
+
+## 🚀 使用方法
+
+1. 打开 AdGuard Home 管理面板
+2. 进入 **过滤器** → **DNS 黑名单**
+3. 点击 **添加黑名单** → **添加一个自定义列表**
+4. 粘贴以下地址：
+   \`\`\`
+   $RULES_URL
+   \`\`\`
+5. 点击 **检查更新** 即可
+
+---
+
+## ⚠️ 注意事项
+
+- 本规则**仅适用于 DNS 级别过滤**，已自动移除浏览器插件专用规则
+- 规则来源均为社区维护的公开规则，定期自动更新
+- 如有误杀，请在 AdGuard Home 中手动添加白名单
+
+---
+
+## 📜 许可
+
+本仓库仅作聚合整理，原始规则版权归各规则源作者所有。
+EOF
+          
+          echo ""
+          echo "README.md 已更新"
 
       - name: 保存并推送
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add rules.txt
-          git diff --quiet && git diff --staged --quiet || git commit -m "更新规则 $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')"
+          git add rules.txt README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "🔄 更新规则 $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')"
           git push
