@@ -122,9 +122,59 @@ jobs:
           echo "白名单:$whitelist_count 域名:$domain_count Hosts:$hosts_count 正则:$regex_count 纯域名:$plain_count"
 
       - name: 保存并推送
+        env:
+          REPO: ${{ github.repository }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add rules.txt
-          git diff --quiet && git diff --staged --quiet || git commit -m "更新规则 $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')"
+          
+          UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          
+          cat > README.md << EOF
+# AdGuard Home 聚合规则
+
+## 订阅地址
+\`\`\`
+https://raw.githubusercontent.com/${REPO}/main/rules.txt
+\`\`\`
+
+## 规则统计
+| 类别 | 数量 |
+|------|------|
+| 白名单 | $whitelist_count |
+| 域名屏蔽 | $domain_count |
+| Hosts格式 | $hosts_count |
+| 正则 | $regex_count |
+| 纯域名 | $plain_count |
+| 总计 | $final_count |
+
+更新时间：$UPDATE_TIME (北京时间)
+
+## 更新频率
+每天 8:00 和 20:00（北京时间）自动更新
+
+## 规则来源
+EOF
+
+          source_num=0
+          while IFS= read -r line; do
+            if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
+              source_num=$((source_num + 1))
+              url_clean=$(echo "$line" | tr -d '[:space:]')
+              echo "- $url_clean" >> README.md
+            fi
+          done < sources.txt
+
+          cat >> README.md << EOF
+
+## 使用方法
+1. 打开 AdGuard Home 管理面板
+2. 过滤器 -> DNS 黑名单
+3. 添加黑名单 -> 添加自定义列表
+4. 粘贴上面的订阅地址
+5. 点击检查更新
+EOF
+
+          git add rules.txt README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "更新规则 $UPDATE_TIME"
           git push
