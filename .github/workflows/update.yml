@@ -65,21 +65,6 @@ jobs:
           echo "下载总量: $total_before 行"
           
           # ============ 过滤规则 ============
-          # 保留的格式（AdGuard Home DNS 支持）：
-          #   ||domain^         域名屏蔽
-          #   @@||domain^       白名单
-          #   /regex/           正则表达式
-          #   domain            纯域名
-          #   0.0.0.0 domain    hosts格式
-          #
-          # 过滤掉的内容：
-          #   注释（! # 开头）
-          #   HTML/CSS/JS 代码
-          #   元素隐藏规则（###,##）
-          #   脚本注入规则
-          #   路径片段（& . - / 开头）
-          #   带修饰符的黑名单（$image,$script等）
-          #   但保留白名单中的修饰符（@@开头）
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
@@ -99,6 +84,18 @@ jobs:
           
           echo "去重后: $final_count 条"
           echo "移除: $removed 条"
+          
+          # ============ 调试信息 ============
+          echo ""
+          echo "========================================"
+          echo "  调试信息"
+          echo "========================================"
+          echo "merged-rules.txt 总行数: $(wc -l < merged-rules.txt)"
+          echo "包含 @@ 的行数: $(grep -c '@@' merged-rules.txt 2>/dev/null || echo 0)"
+          echo "以 @@ 开头的行数: $(grep -c '^@@' merged-rules.txt 2>/dev/null || echo 0)"
+          echo "前 10 条 @@ 开头规则:"
+          grep '^@@' merged-rules.txt 2>/dev/null | head -10 || echo "  (无)"
+          echo "========================================"
           
           # ============ 生成文件头部 ============
           {
@@ -135,6 +132,7 @@ jobs:
           # 1. 白名单 (@@ 开头)
           grep -E '^@@' merged-rules.txt | sort -u > rules_whitelist.txt
           whitelist_count=$(wc -l < rules_whitelist.txt)
+          echo "白名单提取数: $whitelist_count"
           
           # 2. 域名屏蔽 (|| 开头，不含 @@)
           grep '^||' merged-rules.txt | grep -v '^@@' | sort -u > rules_domain.txt
@@ -206,7 +204,6 @@ jobs:
             cat rules_plain.txt >> rules.txt
           fi
           
-          # 清理临时文件
           rm -f merged-rules.txt temp_rules.txt rules_*.txt
           
           echo ""
