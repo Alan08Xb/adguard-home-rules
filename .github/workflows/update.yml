@@ -22,15 +22,15 @@ jobs:
           rule_sources=0
           valid_sources=0
           total_raw=0
-          
+
           echo "开始下载规则源"
-          
+
           while IFS= read -r url; do
             if echo "$url" | grep -qv '^#' && [ -n "$url" ]; then
               url=$(echo "$url" | tr -d '[:space:]')
               rule_sources=$((rule_sources + 1))
               echo "[$rule_sources] $url"
-              
+
               if curl -sS --retry 3 --connect-timeout 30 "$url" -o temp_download.txt 2>/dev/null; then
                 first_line=$(head -1 temp_download.txt)
                 if echo "$first_line" | grep -qiE '<!doctype|<html|<head|<body|<title|<meta'; then
@@ -49,12 +49,12 @@ jobs:
               rm -f temp_download.txt
             fi
           done < sources.txt
-          
+
           echo ""
           echo "有效源: $valid_sources / $rule_sources"
           total_before=$(wc -l < temp_rules.txt)
           echo "下载: $total_before 行"
-          
+
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
@@ -69,12 +69,12 @@ jobs:
           grep -vE '^\|\|.*\$[a-z]' | \
           sed 's/[[:space:]]*$//' | \
           sort -u > merged-rules.txt
-          
+
           final_count=$(wc -l < merged-rules.txt)
           echo "去重后: $final_count 条"
-          
+
           UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
-          
+
           grep -E '^@@' merged-rules.txt | sort -u > rules_wl.txt
           whitelist_count=$(wc -l < rules_wl.txt)
           grep '^||' merged-rules.txt | grep -v '^@@' | sort -u > rules_dm.txt
@@ -85,7 +85,7 @@ jobs:
           regex_count=$(wc -l < rules_rx.txt)
           grep -v '^@@' merged-rules.txt | grep -v '^||' | grep -v '^/' | grep -vE '^(0\.0\.0\.0|127\.0\.0\.1)' | sort -u > rules_pl.txt
           plain_count=$(wc -l < rules_pl.txt)
-          
+
           echo "! ==========================================" > rules.txt
           echo "! 聚合广告过滤规则 (DNS可用)" >> rules.txt
           echo "! 更新时间: $UPDATE_TIME (北京时间)" >> rules.txt
@@ -93,88 +93,64 @@ jobs:
           echo "! 去重后: $final_count 条" >> rules.txt
           echo "! ==========================================" >> rules.txt
           echo "" >> rules.txt
-          
+
           echo "! --- 白名单 $whitelist_count 条 ---" >> rules.txt
           cat rules_wl.txt >> rules.txt
           echo "" >> rules.txt
           echo "! --- 域名屏蔽 $domain_count 条 ---" >> rules.txt
           cat rules_dm.txt >> rules.txt
-          
+
           if [ "$hosts_count" -gt 0 ]; then
             echo "" >> rules.txt
             echo "! --- Hosts格式 $hosts_count 条 ---" >> rules.txt
             cat rules_hs.txt >> rules.txt
           fi
-          
+
           echo "" >> rules.txt
           echo "! --- 正则 $regex_count 条 ---" >> rules.txt
           cat rules_rx.txt >> rules.txt
-          
+
           if [ "$plain_count" -gt 0 ]; then
             echo "" >> rules.txt
             echo "! --- 纯域名 $plain_count 条 ---" >> rules.txt
             cat rules_pl.txt >> rules.txt
           fi
-          
+
           rm -f merged-rules.txt temp_rules.txt rules_*.txt
-          
+
           echo ""
           echo "白名单:$whitelist_count 域名:$domain_count Hosts:$hosts_count 正则:$regex_count 纯域名:$plain_count"
 
+      - name: 生成README
+        run: |
+          UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+
+          echo "# AdGuard Home 聚合规则" > README.md
+          echo "" >> README.md
+          echo "## 订阅地址" >> README.md
+          echo "" >> README.md
+          echo '```' >> README.md
+          echo "https://raw.githubusercontent.com/${{ github.repository }}/main/rules.txt" >> README.md
+          echo '```' >> README.md
+          echo "" >> README.md
+          echo "## 更新频率" >> README.md
+          echo "" >> README.md
+          echo "每天 6:00 和 18:00（北京时间）自动更新" >> README.md
+          echo "" >> README.md
+          echo "> 上次更新: $UPDATE_TIME" >> README.md
+          echo "" >> README.md
+          echo "## 使用方法" >> README.md
+          echo "" >> README.md
+          echo "1. 打开 AdGuard Home 管理面板" >> README.md
+          echo "2. 过滤器 -> DNS 黑名单" >> README.md
+          echo "3. 添加黑名单 -> 添加自定义列表" >> README.md
+          echo "4. 粘贴上面的订阅地址" >> README.md
+          echo "5. 点击检查更新" >> README.md
+
       - name: 保存并推送
-        env:
-          REPO: ${{ github.repository }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
-          
-          cat > README.md << EOF
-# AdGuard Home 聚合规则
-
-## 订阅地址
-\`\`\`
-https://raw.githubusercontent.com/${REPO}/main/rules.txt
-\`\`\`
-
-## 规则统计
-| 类别 | 数量 |
-|------|------|
-| 白名单 | $whitelist_count |
-| 域名屏蔽 | $domain_count |
-| Hosts格式 | $hosts_count |
-| 正则 | $regex_count |
-| 纯域名 | $plain_count |
-| 总计 | $final_count |
-
-更新时间：$UPDATE_TIME (北京时间)
-
-## 更新频率
-每天 8:00 和 20:00（北京时间）自动更新
-
-## 规则来源
-EOF
-
-          source_num=0
-          while IFS= read -r line; do
-            if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
-              source_num=$((source_num + 1))
-              url_clean=$(echo "$line" | tr -d '[:space:]')
-              echo "- $url_clean" >> README.md
-            fi
-          done < sources.txt
-
-          cat >> README.md << EOF
-
-## 使用方法
-1. 打开 AdGuard Home 管理面板
-2. 过滤器 -> DNS 黑名单
-3. 添加黑名单 -> 添加自定义列表
-4. 粘贴上面的订阅地址
-5. 点击检查更新
-EOF
-
           git add rules.txt README.md
-          git diff --quiet && git diff --staged --quiet || git commit -m "更新规则 $UPDATE_TIME"
+          git diff --quiet && git diff --staged --quiet || git commit -m "更新规则 $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M')"
           git push
