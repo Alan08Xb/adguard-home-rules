@@ -64,14 +64,22 @@ jobs:
           total_before=$(wc -l < temp_rules.txt)
           echo "下载总量: $total_before 行"
           
-          # 过滤：保留 AdGuard Home DNS 支持的所有格式
-          # 支持的格式：
+          # ============ 过滤规则 ============
+          # 保留的格式（AdGuard Home DNS 支持）：
           #   ||domain^         域名屏蔽
           #   @@||domain^       白名单
-          #   /regex/           正则
+          #   /regex/           正则表达式
           #   domain            纯域名
           #   0.0.0.0 domain    hosts格式
-          #   ||domain^$modifier 带修饰符
+          #
+          # 过滤掉的内容：
+          #   注释（! # 开头）
+          #   HTML/CSS/JS 代码
+          #   元素隐藏规则（###,##）
+          #   脚本注入规则
+          #   路径片段（& . - / 开头）
+          #   带修饰符的黑名单（$image,$script等）
+          #   但保留白名单中的修饰符（@@开头）
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
@@ -82,6 +90,7 @@ jobs:
           grep -vE 'override-property-read|script:inject|script:contains|:style|:xpath' | \
           grep -vE '^\[|^\^|^\?|^&' | \
           grep -vE '^(&|\.|\-|\/)' | \
+          grep -vE '^\|\|.*\$[a-z]' | \
           sed 's/[[:space:]]*$//' | \
           sort -u > merged-rules.txt
           
@@ -91,9 +100,10 @@ jobs:
           echo "去重后: $final_count 条"
           echo "移除: $removed 条"
           
+          # ============ 生成文件头部 ============
           {
             echo "! =========================================="
-            echo "! Title: 聚合广告过滤规则 (DNS可用规则)"
+            echo "! Title: 聚合广告过滤规则 (DNS可用)"
             echo "! =========================================="
             echo "! 更新时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') (北京时间)"
             echo "! 有效规则源: $valid_sources 个"
@@ -123,7 +133,7 @@ jobs:
           
           # ============ 分类排列 ============
           # 1. 白名单 (@@ 开头)
-          grep '^@@' merged-rules.txt | sort -u > rules_whitelist.txt
+          grep -E '^@@' merged-rules.txt | sort -u > rules_whitelist.txt
           whitelist_count=$(wc -l < rules_whitelist.txt)
           
           # 2. 域名屏蔽 (|| 开头，不含 @@)
@@ -138,10 +148,11 @@ jobs:
           grep '^/' merged-rules.txt | sort -u > rules_regex.txt
           regex_count=$(wc -l < rules_regex.txt)
           
-          # 5. 纯域名 (不含特殊前缀)
+          # 5. 纯域名
           grep -v '^@@' merged-rules.txt | grep -v '^||' | grep -v '^/' | grep -vE '^(0\.0\.0\.0|127\.0\.0\.1)' | sort -u > rules_plain.txt
           plain_count=$(wc -l < rules_plain.txt)
           
+          # 写入各分类
           {
             echo "! ╔══════════════════════════════════════════╗"
             echo "! ║     白名单规则 (@@ 开头)               ║"
@@ -195,6 +206,7 @@ jobs:
             cat rules_plain.txt >> rules.txt
           fi
           
+          # 清理临时文件
           rm -f merged-rules.txt temp_rules.txt rules_*.txt
           
           echo ""
