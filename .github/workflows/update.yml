@@ -81,6 +81,7 @@ jobs:
           grep -vE '##|#@#' | \
           grep -vE 'override-property-read|script:inject|script:contains|:style|:xpath' | \
           grep -vE '^\[|^\^|^\?|^&' | \
+          grep -vE '^(&|\.|\-|\/)' | \
           sed 's/[[:space:]]*$//' | \
           sort -u > merged-rules.txt
           
