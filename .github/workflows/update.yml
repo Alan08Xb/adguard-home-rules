@@ -22,17 +22,18 @@ jobs:
           rule_sources=0
           valid_sources=0
           total_raw=0
-
+          
           echo "========================================"
           echo "  开始下载规则源"
           echo "========================================"
-
+          
           while IFS= read -r url; do
             if echo "$url" | grep -qv '^#' && [ -n "$url" ]; then
               url=$(echo "$url" | tr -d '[:space:]')
               rule_sources=$((rule_sources + 1))
               echo ""
               echo "[$rule_sources] 下载: $url"
+              
               if curl -sS --retry 3 --connect-timeout 30 "$url" -o temp_download.txt 2>/dev/null; then
                 first_line=$(head -1 temp_download.txt)
                 if echo "$first_line" | grep -qiE '<!doctype|<html|<head|<body|<title|<meta'; then
@@ -40,10 +41,12 @@ jobs:
                   rm -f temp_download.txt
                   continue
                 fi
+                
                 download_count=$(wc -l < temp_download.txt)
                 total_raw=$((total_raw + download_count))
                 valid_sources=$((valid_sources + 1))
                 echo "   成功: $download_count 行"
+                
                 cat temp_download.txt >> temp_rules.txt
               else
                 echo "   失败: 无法下载"
@@ -51,15 +54,16 @@ jobs:
               rm -f temp_download.txt
             fi
           done < sources.txt
-
+          
           echo ""
           echo "========================================"
           echo "  处理规则"
           echo "========================================"
           echo "有效源: $valid_sources / $rule_sources"
+          
           total_before=$(wc -l < temp_rules.txt)
           echo "下载总量: $total_before 行"
-
+          
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
@@ -74,14 +78,15 @@ jobs:
           grep -vE '^\|\|.*\$[a-z]' | \
           sed 's/[[:space:]]*$//' | \
           sort -u > merged-rules.txt
-
+          
           final_count=$(wc -l < merged-rules.txt)
           removed=$((total_before - final_count))
+          
           echo "去重后: $final_count 条"
           echo "移除: $removed 条"
-
+          
           UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
-
+          
           echo "! ==========================================" > rules.txt
           echo "! Title: 聚合广告过滤规则 (DNS可用)" >> rules.txt
           echo "! ==========================================" >> rules.txt
@@ -109,29 +114,29 @@ jobs:
           done < sources.txt
           echo "! ==========================================" >> rules.txt
           echo "" >> rules.txt
-
+          
           grep -E '^@@' merged-rules.txt | sort -u > rules_whitelist.txt
           whitelist_count=$(wc -l < rules_whitelist.txt)
-
+          
           grep '^||' merged-rules.txt | grep -v '^@@' | sort -u > rules_domain.txt
           domain_count=$(wc -l < rules_domain.txt)
-
+          
           grep -E '^(0\.0\.0\.0|127\.0\.0\.1)[[:space:]]' merged-rules.txt | sort -u > rules_hosts.txt
           hosts_count=$(wc -l < rules_hosts.txt)
-
+          
           grep '^/' merged-rules.txt | sort -u > rules_regex.txt
           regex_count=$(wc -l < rules_regex.txt)
-
+          
           grep -v '^@@' merged-rules.txt | grep -v '^||' | grep -v '^/' | grep -vE '^(0\.0\.0\.0|127\.0\.0\.1)' | sort -u > rules_plain.txt
           plain_count=$(wc -l < rules_plain.txt)
-
+          
           echo "! ╔══════════════════════════════════════════╗" >> rules.txt
           echo "! ║     白名单规则 (@@ 开头)               ║" >> rules.txt
           echo "! ║     共 $whitelist_count 条                        ║" >> rules.txt
           echo "! ╚══════════════════════════════════════════╝" >> rules.txt
           echo "" >> rules.txt
           cat rules_whitelist.txt >> rules.txt
-
+          
           echo "" >> rules.txt
           echo "! ╔══════════════════════════════════════════╗" >> rules.txt
           echo "! ║     域名屏蔽规则 (|| 开头)              ║" >> rules.txt
@@ -139,7 +144,7 @@ jobs:
           echo "! ╚══════════════════════════════════════════╝" >> rules.txt
           echo "" >> rules.txt
           cat rules_domain.txt >> rules.txt
-
+          
           if [ "$hosts_count" -gt 0 ]; then
             echo "" >> rules.txt
             echo "! ╔══════════════════════════════════════════╗" >> rules.txt
@@ -149,7 +154,7 @@ jobs:
             echo "" >> rules.txt
             cat rules_hosts.txt >> rules.txt
           fi
-
+          
           echo "" >> rules.txt
           echo "! ╔══════════════════════════════════════════╗" >> rules.txt
           echo "! ║     正则表达式规则 (/ 开头)             ║" >> rules.txt
@@ -157,7 +162,7 @@ jobs:
           echo "! ╚══════════════════════════════════════════╝" >> rules.txt
           echo "" >> rules.txt
           cat rules_regex.txt >> rules.txt
-
+          
           if [ "$plain_count" -gt 0 ]; then
             echo "" >> rules.txt
             echo "! ╔══════════════════════════════════════════╗" >> rules.txt
@@ -167,9 +172,9 @@ jobs:
             echo "" >> rules.txt
             cat rules_plain.txt >> rules.txt
           fi
-
+          
           rm -f merged-rules.txt temp_rules.txt rules_*.txt
-
+          
           echo ""
           echo "========================================"
           echo "  统计汇总"
@@ -182,68 +187,55 @@ jobs:
           echo "----------------------------------------"
           echo "总计:      $final_count 条"
           echo "========================================"
+          
+          cat > README.md << EOF
+# AdGuard Home 聚合规则
 
-          RULES_URL="https://raw.githubusercontent.com/${{ github.repository }}/main/rules.txt"
-
-          cat > README.md << ENDOFFILE
-# 🛡️ AdGuard Home 聚合规则
-
-[![自动更新规则](https://github.com/${{ github.repository }}/actions/workflows/update.yml/badge.svg)](https://github.com/${{ github.repository }}/actions/workflows/update.yml)
-
-## 📋 规则订阅地址
-
+## 规则订阅地址
 \`\`\`
-$RULES_URL
+https://raw.githubusercontent.com/${{ github.repository }}/main/rules.txt
 \`\`\`
 
-## 📊 当前规则统计
-
+## 当前规则统计
 | 类别 | 数量 |
 |------|------|
-| 🟢 白名单规则 | $whitelist_count |
-| 🔴 域名屏蔽规则 | $domain_count |
-| 🟡 Hosts 格式规则 | $hosts_count |
-| 🔵 正则表达式规则 | $regex_count |
-| ⚪ 纯域名规则 | $plain_count |
-| **📌 总计** | **$final_count** |
+| 白名单规则 | $whitelist_count |
+| 域名屏蔽规则 | $domain_count |
+| Hosts 格式规则 | $hosts_count |
+| 正则表达式规则 | $regex_count |
+| 纯域名规则 | $plain_count |
+| 总计 | $final_count |
 
-> 更新时间：$UPDATE_TIME (北京时间)
+更新时间：$UPDATE_TIME (北京时间)
 
-## 🔄 更新频率
+## 更新频率
+每天自动更新两次（北京时间 6:00 和 18:00）
 
-每天自动更新两次（北京时间 **6:00** 和 **18:00**）
-
-## 📂 规则来源
-
-| # | 规则源 |
-|---|--------|
-ENDOFFILE
+## 规则来源
+EOF
 
           source_num=0
           while IFS= read -r line; do
             if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
               source_num=$((source_num + 1))
               url_clean=$(echo "$line" | tr -d '[:space:]')
-              echo "| $source_num | $url_clean |" >> README.md
+              echo "- $url_clean" >> README.md
             fi
           done < sources.txt
 
-          cat >> README.md << ENDOFFILE
+          cat >> README.md << EOF
 
-## 🚀 使用方法
-
+## 使用方法
 1. 打开 AdGuard Home 管理面板
-2. 进入 **过滤器** → **DNS 黑名单**
-3. 点击 **添加黑名单** → **添加一个自定义列表**
+2. 进入 过滤器 -> DNS 黑名单
+3. 点击 添加黑名单 -> 添加一个自定义列表
 4. 粘贴规则订阅地址
-5. 点击 **检查更新** 即可
+5. 点击 检查更新 即可
 
-## ⚠️ 注意事项
-
+## 注意事项
 - 本规则仅适用于 DNS 级别过滤，已自动移除浏览器插件专用规则
 - 规则来源均为社区维护的公开规则，定期自动更新
-- 如有误杀，请在 AdGuard Home 中手动添加白名单
-ENDOFFILE
+EOF
 
           echo ""
           echo "README.md 已更新"
