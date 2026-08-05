@@ -71,7 +71,9 @@ jobs:
           sort -u > merged-rules.txt
 
           final_count=$(wc -l < merged-rules.txt)
+          removed=$((total_before - final_count))
           echo "去重后: $final_count 条"
+          echo "移除: $removed 条"
 
           UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
 
@@ -88,9 +90,21 @@ jobs:
 
           echo "! ==========================================" > rules.txt
           echo "! 聚合广告过滤规则 (DNS可用)" >> rules.txt
+          echo "! ==========================================" >> rules.txt
           echo "! 更新时间: $UPDATE_TIME (北京时间)" >> rules.txt
-          echo "! 规则源: $valid_sources 个" >> rules.txt
-          echo "! 去重后: $final_count 条" >> rules.txt
+          echo "! 有效规则源: $valid_sources/$rule_sources" >> rules.txt
+          echo "! 下载总量: $total_before 条" >> rules.txt
+          echo "! 去重后总数: $final_count 条" >> rules.txt
+          echo "! 移除无效/重复: $removed 条" >> rules.txt
+          echo "! ==========================================" >> rules.txt
+          echo "!" >> rules.txt
+          echo "! 规则来源:" >> rules.txt
+          while IFS= read -r line; do
+            if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
+              url_clean=$(echo "$line" | tr -d '[:space:]')
+              echo "!   - $url_clean" >> rules.txt
+            fi
+          done < sources.txt
           echo "! ==========================================" >> rules.txt
           echo "" >> rules.txt
 
@@ -138,6 +152,15 @@ jobs:
           echo "每天 6:00 和 18:00（北京时间）自动更新" >> README.md
           echo "" >> README.md
           echo "> 上次更新: $UPDATE_TIME" >> README.md
+          echo "" >> README.md
+          echo "## 规则来源" >> README.md
+          echo "" >> README.md
+          while IFS= read -r line; do
+            if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
+              url_clean=$(echo "$line" | tr -d '[:space:]')
+              echo "- $url_clean" >> README.md
+            fi
+          done < sources.txt
           echo "" >> README.md
           echo "## 使用方法" >> README.md
           echo "" >> README.md
