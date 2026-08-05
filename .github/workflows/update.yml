@@ -65,11 +65,13 @@ jobs:
           echo "下载总量: $total_before 行"
           
           # ============ 过滤规则 ============
+          # 注意：grep -vE '^[[:space:]]*[.#]' 只过滤 . 和 # 开头
+          # 保留 @ 开头（白名单 @@ 格式）
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
           grep -vE '[{}]' | \
-          grep -vE '^[[:space:]]*[.@#]' | \
+          grep -vE '^[[:space:]]*[.#]' | \
           grep -vE 'font-|margin|padding|color|background|display|text-' | \
           grep -vE '##|#@#' | \
           grep -vE 'override-property-read|script:inject|script:contains|:style|:xpath' | \
@@ -84,18 +86,6 @@ jobs:
           
           echo "去重后: $final_count 条"
           echo "移除: $removed 条"
-          
-          # ============ 调试信息 ============
-          echo ""
-          echo "========================================"
-          echo "  调试信息"
-          echo "========================================"
-          echo "merged-rules.txt 总行数: $(wc -l < merged-rules.txt)"
-          echo "包含 @@ 的行数: $(grep -c '@@' merged-rules.txt 2>/dev/null || echo 0)"
-          echo "以 @@ 开头的行数: $(grep -c '^@@' merged-rules.txt 2>/dev/null || echo 0)"
-          echo "前 10 条 @@ 开头规则:"
-          grep '^@@' merged-rules.txt 2>/dev/null | head -10 || echo "  (无)"
-          echo "========================================"
           
           # ============ 生成文件头部 ============
           {
@@ -132,7 +122,6 @@ jobs:
           # 1. 白名单 (@@ 开头)
           grep -E '^@@' merged-rules.txt | sort -u > rules_whitelist.txt
           whitelist_count=$(wc -l < rules_whitelist.txt)
-          echo "白名单提取数: $whitelist_count"
           
           # 2. 域名屏蔽 (|| 开头，不含 @@)
           grep '^||' merged-rules.txt | grep -v '^@@' | sort -u > rules_domain.txt
@@ -207,6 +196,7 @@ jobs:
           rm -f merged-rules.txt temp_rules.txt rules_*.txt
           
           echo ""
+          echo "白名单: $whitelist_count | 域名屏蔽: $domain_count | Hosts: $hosts_count | 正则: $regex_count | 纯域名: $plain_count"
           echo "完成!"
 
       - name: 保存并推送
