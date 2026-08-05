@@ -2,8 +2,8 @@ name: 自动更新规则
 
 on:
   schedule:
-    - cron: '0 9 * * *'
-    - cron: '0 21 * * *'
+    - cron: '0 10 * * *'
+    - cron: '0 22 * * *'
   workflow_dispatch:
 
 permissions:
@@ -64,17 +64,23 @@ jobs:
           total_before=$(wc -l < temp_rules.txt)
           echo "下载总量: $total_before 行"
           
-          # 过滤：只保留 DNS 可用的域名规则
+          # 过滤：保留 AdGuard Home DNS 支持的所有格式
+          # 支持的格式：
+          #   ||domain^         域名屏蔽
+          #   @@||domain^       白名单
+          #   /regex/           正则
+          #   domain            纯域名
+          #   0.0.0.0 domain    hosts格式
+          #   ||domain^$modifier 带修饰符
           grep -v '^[!！#\[]' temp_rules.txt | \
           grep -v '^$' | \
           grep -vE '<[a-zA-Z/]' | \
           grep -vE '[{}]' | \
           grep -vE '^[[:space:]]*[.@#]' | \
           grep -vE 'font-|margin|padding|color|background|display|text-' | \
-          grep -vE '\$[a-z]' | \
           grep -vE '##|#@#' | \
-          grep -vE 'override-property-read|script:inject|script:contains' | \
-          grep -vE '^\|?https?://' | \
+          grep -vE 'override-property-read|script:inject|script:contains|:style|:xpath' | \
+          grep -vE '^\[|^\^|^\?|^&' | \
           sed 's/[[:space:]]*$//' | \
           sort -u > merged-rules.txt
           
@@ -86,13 +92,21 @@ jobs:
           
           {
             echo "! =========================================="
-            echo "! Title: 聚合广告过滤规则 (仅DNS可用规则)"
+            echo "! Title: 聚合广告过滤规则 (DNS可用规则)"
             echo "! =========================================="
             echo "! 更新时间: $(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S') (北京时间)"
             echo "! 有效规则源: $valid_sources 个"
             echo "! 下载总量: $total_before 条"
             echo "! 去重后总数: $final_count 条"
             echo "! 移除无效/重复: $removed 条"
+            echo "! =========================================="
+            echo "!"
+            echo "! 支持的规则格式:"
+            echo "!   ||domain^        域名屏蔽"
+            echo "!   @@||domain^      白名单"
+            echo "!   /regex/          正则表达式"
+            echo "!   domain           纯域名"
+            echo "!   0.0.0.0 domain   hosts格式"
             echo "! =========================================="
             echo "!"
             echo "! 规则来源列表:"
@@ -106,8 +120,81 @@ jobs:
             echo ""
           } > rules.txt
           
-          cat merged-rules.txt >> rules.txt
-          rm -f temp_rules.txt merged-rules.txt
+          # ============ 分类排列 ============
+          # 1. 白名单 (@@ 开头)
+          grep '^@@' merged-rules.txt | sort -u > rules_whitelist.txt
+          whitelist_count=$(wc -l < rules_whitelist.txt)
+          
+          # 2. 域名屏蔽 (|| 开头，不含 @@)
+          grep '^||' merged-rules.txt | grep -v '^@@' | sort -u > rules_domain.txt
+          domain_count=$(wc -l < rules_domain.txt)
+          
+          # 3. hosts 格式 (IP 开头)
+          grep -E '^(0\.0\.0\.0|127\.0\.0\.1)[[:space:]]' merged-rules.txt | sort -u > rules_hosts.txt
+          hosts_count=$(wc -l < rules_hosts.txt)
+          
+          # 4. 正则表达式 (/ 开头)
+          grep '^/' merged-rules.txt | sort -u > rules_regex.txt
+          regex_count=$(wc -l < rules_regex.txt)
+          
+          # 5. 纯域名 (不含特殊前缀)
+          grep -v '^@@' merged-rules.txt | grep -v '^||' | grep -v '^/' | grep -vE '^(0\.0\.0\.0|127\.0\.0\.1)' | sort -u > rules_plain.txt
+          plain_count=$(wc -l < rules_plain.txt)
+          
+          {
+            echo "! ╔══════════════════════════════════════════╗"
+            echo "! ║     白名单规则 (@@ 开头)               ║"
+            echo "! ║     共 $whitelist_count 条                        ║"
+            echo "! ╚══════════════════════════════════════════╝"
+            echo ""
+          } >> rules.txt
+          cat rules_whitelist.txt >> rules.txt
+          
+          {
+            echo ""
+            echo "! ╔══════════════════════════════════════════╗"
+            echo "! ║     域名屏蔽规则 (|| 开头)              ║"
+            echo "! ║     共 $domain_count 条                        ║"
+            echo "! ╚══════════════════════════════════════════╝"
+            echo ""
+          } >> rules.txt
+          cat rules_domain.txt >> rules.txt
+          
+          if [ "$hosts_count" -gt 0 ]; then
+            {
+              echo ""
+              echo "! ╔══════════════════════════════════════════╗"
+              echo "! ║     Hosts 格式规则 (IP domain)          ║"
+              echo "! ║     共 $hosts_count 条                          ║"
+              echo "! ╚══════════════════════════════════════════╝"
+              echo ""
+            } >> rules.txt
+            cat rules_hosts.txt >> rules.txt
+          fi
+          
+          {
+            echo ""
+            echo "! ╔══════════════════════════════════════════╗"
+            echo "! ║     正则表达式规则 (/ 开头)             ║"
+            echo "! ║     共 $regex_count 条                         ║"
+            echo "! ╚══════════════════════════════════════════╝"
+            echo ""
+          } >> rules.txt
+          cat rules_regex.txt >> rules.txt
+          
+          if [ "$plain_count" -gt 0 ]; then
+            {
+              echo ""
+              echo "! ╔══════════════════════════════════════════╗"
+              echo "! ║     纯域名规则 (普通域名)               ║"
+              echo "! ║     共 $plain_count 条                         ║"
+              echo "! ╚══════════════════════════════════════════╝"
+              echo ""
+            } >> rules.txt
+            cat rules_plain.txt >> rules.txt
+          fi
+          
+          rm -f merged-rules.txt temp_rules.txt rules_*.txt
           
           echo ""
           echo "完成!"
