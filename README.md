@@ -10,7 +10,7 @@ https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules.txt
 
 每天 6:00 和 18:00（北京时间）自动更新
 
-> 上次更新: 2026-08-08 18:34:03
+> 上次更新: 2026-08-09 06:18:27
 
 ## 规则来源
 
