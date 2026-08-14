@@ -10,7 +10,7 @@ https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules.txt
 
 每天 6:00 和 18:00（北京时间）自动更新
 
-> 上次更新: 2026-08-14 06:31:33
+> 上次更新: 2026-08-14 18:58:22
 
 ## 规则来源
 
@@ -31,6 +31,8 @@ https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules.txt
 - https://adaway.org/hosts.txt
 - https://easylist.to/easylist/easyprivacy.txt
 - https://cdn.jsdelivr.net/gh/badmojr/1Hosts@master/Lite/adblock.txt
+- https://easylist-downloads.adblockplus.org/easylistchina.txt
+- https://easylist-downloads.adblockplus.org/easylist-cookie.txt
 
 ## 使用方法
 
