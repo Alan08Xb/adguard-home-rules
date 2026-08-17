@@ -138,6 +138,7 @@ jobs:
       - name: 生成README
         run: |
           UPDATE_TIME=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          read whitelist_count domain_count hosts_count regex_count plain_count final_count valid_sources rule_sources total_before removed < stats.txt
 
           echo "# AdGuard Home 聚合规则" > README.md
           echo "" >> README.md
@@ -166,7 +167,7 @@ jobs:
           echo "" >> README.md
           echo "## 更新频率" >> README.md
           echo "" >> README.md
-          echo "每天 6:00 和 18:00（北京时间）自动更新" >> README.md
+          echo "每天 8:00 和 20:00（北京时间）自动更新" >> README.md
           echo "" >> README.md
           echo "---" >> README.md
           echo "" >> README.md
