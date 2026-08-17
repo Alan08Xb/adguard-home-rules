@@ -6,7 +6,7 @@
 https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules.txt
 ```
 
-> 上次更新: 2026-08-17 11:19:56 (北京时间)
+> 上次更新: 2026-08-17 11:22:07 (北京时间)
 
 ---
 
