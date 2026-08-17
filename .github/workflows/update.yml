@@ -167,7 +167,7 @@ jobs:
           echo "" >> README.md
           echo "## 更新频率" >> README.md
           echo "" >> README.md
-          echo "每天 8:00 和 20:00（北京时间）自动更新" >> README.md
+          echo "每天 6:00 和 18:00（北京时间）自动更新" >> README.md
           echo "" >> README.md
           echo "---" >> README.md
           echo "" >> README.md
