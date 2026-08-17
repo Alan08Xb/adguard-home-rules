@@ -130,10 +130,13 @@ jobs:
             cat rules_pl.txt >> rules.txt
           fi
 
-          rm -f merged-rules.txt temp_rules.txt rules_*.txt
+          rm -f merged-rules.txt temp_rules.txt rules_wl.txt rules_dm.txt rules_hs.txt rules_rx.txt rules_pl.txt
 
           echo ""
           echo "白名单:$whitelist_count 域名:$domain_count Hosts:$hosts_count 正则:$regex_count 纯域名:$plain_count"
+
+          # 保存统计数据供下一个step使用
+          echo "$whitelist_count $domain_count $hosts_count $regex_count $plain_count $final_count $valid_sources $rule_sources $total_before $removed" > stats.txt
 
       - name: 生成README
         run: |
