@@ -147,20 +147,45 @@ jobs:
           echo "https://raw.githubusercontent.com/${{ github.repository }}/main/rules.txt" >> README.md
           echo '```' >> README.md
           echo "" >> README.md
+          echo "> 上次更新: $UPDATE_TIME (北京时间)" >> README.md
+          echo "" >> README.md
+          echo "---" >> README.md
+          echo "" >> README.md
+          echo "## 规则统计" >> README.md
+          echo "" >> README.md
+          echo "| 类别 | 数量 |" >> README.md
+          echo "|------|------|" >> README.md
+          echo "| 白名单 | $whitelist_count |" >> README.md
+          echo "| 域名屏蔽 | $domain_count |" >> README.md
+          echo "| Hosts格式 | $hosts_count |" >> README.md
+          echo "| 正则表达式 | $regex_count |" >> README.md
+          echo "| 纯域名 | $plain_count |" >> README.md
+          echo "| **总计** | **$final_count** |" >> README.md
+          echo "" >> README.md
+          echo "---" >> README.md
+          echo "" >> README.md
           echo "## 更新频率" >> README.md
           echo "" >> README.md
           echo "每天 6:00 和 18:00（北京时间）自动更新" >> README.md
           echo "" >> README.md
-          echo "> 上次更新: $UPDATE_TIME" >> README.md
+          echo "---" >> README.md
           echo "" >> README.md
           echo "## 规则来源" >> README.md
           echo "" >> README.md
+          echo "| # | 规则源 |" >> README.md
+          echo "|---|--------|" >> README.md
+
+          source_num=0
           while IFS= read -r line; do
             if echo "$line" | grep -qv '^#' && [ -n "$line" ]; then
+              source_num=$((source_num + 1))
               url_clean=$(echo "$line" | tr -d '[:space:]')
-              echo "- $url_clean" >> README.md
+              echo "| $source_num | $url_clean |" >> README.md
             fi
           done < sources.txt
+
+          echo "" >> README.md
+          echo "---" >> README.md
           echo "" >> README.md
           echo "## 使用方法" >> README.md
           echo "" >> README.md
