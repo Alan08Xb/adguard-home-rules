@@ -6,7 +6,7 @@
 https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules.txt
 ```
 
-> 上次更新: 2026-08-26 18:35:45 (北京时间)
+> 上次更新: 2026-08-27 10:25:31 (北京时间)
 
 ---
 
@@ -14,12 +14,12 @@ https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules.txt
 
 | 类别 | 数量 |
 |------|------|
-| 白名单 | 2684 |
-| 域名屏蔽 | 572210 |
+| 白名单 | 2685 |
+| 域名屏蔽 | 571141 |
 | Hosts格式 | 87856 |
 | 正则表达式 | 0 |
 | 纯域名 | 947 |
-| **总计** | **663697** |
+| **总计** | **662629** |
 
 ---
 
