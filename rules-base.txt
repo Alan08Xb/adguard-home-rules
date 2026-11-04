@@ -1,9 +1,9 @@
 ! ==========================================
 ! AdGuard Home 聚合规则 - Base 档
 ! ==========================================
-! 更新时间: 2026-11-04 01:35:47 (北京时间)
+! 更新时间: 2026-11-04 09:45:46 (北京时间)
 ! 有效规则源: 20/20
-! 域名规则: 133080
+! 域名规则: 133087
 ! 白名单: 2687
 ! ==========================================
 
@@ -2696,7 +2696,7 @@
 @@||youku.com/cms/player/userinfo/
 @@||youku.com/cms/playlog/get?
 
-! --- 域名屏蔽 133080 条 ---
+! --- 域名屏蔽 133087 条 ---
 ||0.avmarket.rs^
 ||0.myikas.com^
 ||0.net.easyjet.com^
@@ -3833,6 +3833,7 @@
 ||1ns1rosb.de^
 ||1nvnkyg65.com^
 ||1nvxl968le.com^
+||1ny5gaksj8.com^
 ||1o.yunqujfh5rzlgh782t.cyou^
 ||1o0g85u7k1.com^
 ||1o1nuqbjea.com^
@@ -24058,6 +24059,7 @@
 ||bsgnovvkcrnyb.site^
 ||bshare.cn^
 ||bshewgrdjyqus.space^
+||bshhyxoy62.com^
 ||bshrdr.com^
 ||bsigxzskaybsw.website^
 ||bsjgdn.supergoop.com^
@@ -38015,7 +38017,6 @@
 ||dottlesraggyabitibi.qpon^
 ||dottodatacenter.net^
 ||dotui.cn^
-||dotyruntchan.com^
 ||douban.com^
 ||doubanio.com^
 ||double-check.com^
@@ -57573,6 +57574,7 @@
 ||ineemotbptecd.online^
 ||inencr.woodhouseclothing.com^
 ||ineoocqxztbzj.site^
+||inequation23.com^
 ||inestimablereddencloset.com^
 ||inetlog.ru^
 ||inetstats.org^
@@ -59091,6 +59093,7 @@
 ||inwindsseppukulenitic.cfd^
 ||inwmizqchqjlk.space^
 ||inyoitepimbina.qpon^
+||inyourpocket.co.uk^
 ||inzicht.cz.nl^
 ||inznbvtcgmfzn.store^
 ||inzy3qq8q.com^
@@ -78110,6 +78113,7 @@
 ||mzy2014.com^
 ||mzykitcgblmwl.online^
 ||mzypnfarkhqww.site^
+||mzzueflt.com^
 ||mzzzpvllsjxpy.online^
 ||n-analytics.io^
 ||n-core-pipe.com^
@@ -80887,6 +80891,7 @@
 ||o8u3n4q7fe.com^
 ||o911o.com^
 ||o9gvxuj9t6.com^
+||o9m5znv8ta.com^
 ||o9qdqbu6nu.com^
 ||o9tt6h08li.execute-api.eu-west-1.amazonaws.com^
 ||oa-panther.data.aliyun.com^
@@ -113803,6 +113808,7 @@
 ||telemetry.doxo.com^
 ||telemetry.dropbox.com^
 ||telemetry.dzen.ru^
+||telemetry.ecosoft.group^
 ||telemetry.enterprise.githubcopilot.com^
 ||telemetry.eyeo.com^
 ||telemetry.firez.one^
@@ -124354,6 +124360,7 @@
 ||vfjoawcligjcs.online^
 ||vfkwbnwrglemo.online^
 ||vfmahn.slevomat.cz^
+||vfmlgaxxc4.com^
 ||vfmqozdgawaii.website^
 ||vfnq.cn^
 ||vfnxqznmwbcee.store^
