@@ -1,9 +1,9 @@
 ! ==========================================
 ! AdGuard Home 聚合规则 - Base 档
 ! ==========================================
-! 更新时间: 2026-11-13 01:56:50 (北京时间)
+! 更新时间: 2026-11-13 10:17:12 (北京时间)
 ! 有效规则源: 20/20
-! 域名规则: 131627
+! 域名规则: 131619
 ! 白名单: 2692
 ! ==========================================
 
@@ -2701,7 +2701,7 @@
 @@||youku.com/cms/player/userinfo/
 @@||youku.com/cms/playlog/get?
 
-! --- 域名屏蔽 131627 条 ---
+! --- 域名屏蔽 131619 条 ---
 ||0.myikas.com^
 ||0.net.easyjet.com^
 ||00000.uno^
@@ -3027,7 +3027,6 @@
 ||1.letvlive.com^
 ||1.lishibu.com^
 ||1.lvshi567.com^
-||1.lx8boenb9n95ncvgjq.cyou^
 ||1.mgff.com^
 ||1.nanrenwo.net^
 ||1.pncdn.cn^
@@ -3506,7 +3505,6 @@
 ||13afemc28.com^
 ||13bt.info^
 ||13fbbc0ff4.com^
-||13jhmpv.3yr8vql5go73y864.cyou^
 ||13js1lbtbj3.sparkloop.app^
 ||13p76nnir.de^
 ||13yg.cn^
@@ -3610,7 +3608,6 @@
 ||17youzi.com^
 ||17zhaole.com^
 ||17zheng.cn^
-||18.nvrrnuyz87k9xcwc2o4c3x.cyou^
 ||180.96.27.85^
 ||180.xdwan.com^
 ||18052925.im.intermiles.com^
@@ -3888,7 +3885,6 @@
 ||1stparty.equifax.co.uk^
 ||1t5agapb.xyz^
 ||1tds26q95.de^
-||1ti8n22.8o9jjl21flk8hj.cyou^
 ||1tlm.cn^
 ||1to1.bbva.com^
 ||1to1.enautics.com^
@@ -4815,7 +4811,6 @@
 ||4171ea7508.com^
 ||41fun8xi9zh53ic.cfd^
 ||41hckkm9.xyz^
-||41p.ggzpxymhpceopgtoc.cyou^
 ||41terraen.net^
 ||41vtzzt0s.com^
 ||42.by31x2o62bknl6996wv.cyou^
@@ -5071,13 +5066,11 @@
 ||4zm6p17ppr.com^
 ||5.1tb588z5f5o1bwjp6ok9ym29r7i.cyou^
 ||5.5ppt.net^
-||5.5tvcz6ovxvxxptj71te9ipl7hggw.cyou^
 ||5.61.55.143^
 ||5.ccutu.com^
 ||5.ey7rgvrtk4x4zhi8ju6v2u.cyou^
 ||5.grb24e28ovlqn5e8m3wohjr.cyou^
 ||5.gzfenda.com^
-||5.oobjze16nbz2u4687kr8pgp3b.cyou^
 ||5.qqm98.com^
 ||5000systems.net^
 ||5001hybrid.net^
@@ -5369,7 +5362,6 @@
 ||5jhome.com^
 ||5jj6zcxpo.com^
 ||5k1cyldc9.com^
-||5kflgiu.eg59mvbxykwqqf4i3x.cyou^
 ||5kj3hr1gkif6v2bi5ju5bkylvhx.cfd^
 ||5kjpa028wo.com^
 ||5kmm.top^
@@ -5666,7 +5658,6 @@
 ||6glece4homah8dweracea.com^
 ||6grxxoqmpc.com^
 ||6gxvxg.f66kb169q66x7xqkl6y26ycnug.cyou^
-||6gz2kik2u1.exht7oz1w15zjkrxolfctr.cyou^
 ||6h6pdph56.com^
 ||6hre3.3yvfmvymxemboxpq1b8vlo291uc.cyou^
 ||6htu6jje0l.com^
@@ -5681,7 +5672,6 @@
 ||6j296m8k.de^
 ||6j7ywcn8sx.com^
 ||6jei0t6xp.com^
-||6jm3ujowjxpg63hx.7lp3hrzqwzryni94.cyou^
 ||6jtqdplfz7.com^
 ||6k1alauto.com^
 ||6k2fehacp.com^
@@ -6186,7 +6176,6 @@
 ||88cpc.com^
 ||88e0dcb063.com^
 ||88eq7spm.de^
-||88h1u6qqhyp5ew.mp2j222imgo2it.cyou^
 ||88hs.net^
 ||88infra-strat.com^
 ||88ng.com^
@@ -6299,7 +6288,6 @@
 ||8m96jlrph4z8xgxy1ie.cfd^
 ||8mfty.com^
 ||8mp.2vlg1rg5fjyuycrm674b.cyou^
-||8mv.jf7y5erhc86g62ozvlbj.cyou^
 ||8n2iu6djx6.com^
 ||8n67t.com^
 ||8nc8shot.txxx.com^
@@ -6326,7 +6314,6 @@
 ||8spjnme44.com^
 ||8t2.di91ba.cn^
 ||8tjomzqlw.com^
-||8txvx9252.2lwu2vhipe7ok2rc.cyou^
 ||8ue4rp6yxyis.www.tapmyback.com^
 ||8uuxq3tvn.com^
 ||8v1.cn^
@@ -6486,7 +6473,6 @@
 ||97gglrj.5grcwkqytkrkyqzfj6p51jhrktgpt.cyou^
 ||97inservices.net^
 ||97kuaixiu.com^
-||97n8p1jxcobulhor4fy1ej.j8mhuw8noquh6n.cyou^
 ||97nexoleo.net^
 ||97uvo47k3y.com^
 ||97vk351gi.com^
@@ -42431,7 +42417,6 @@
 ||en-leger.org^
 ||en-log.vietnamplus.vn^
 ||en-sg.siemensplmevents.com^
-||en-trezor.io^
 ||en-us.coloplastcare.com^
 ||en.taichuan.com^
 ||en.ultrex.ru^
@@ -47943,6 +47928,7 @@
 ||fxjs.2541.com^
 ||fxlcvd.icu^
 ||fxlskwhqjtzym.website^
+||fxltsbl.com^
 ||fxmdjr.mamastar.jp^
 ||fxmdjr.saita-puls.com^
 ||fxmdjr.yogajournal.jp^
@@ -48959,6 +48945,7 @@
 ||geobar.ziffdavisinternational.com^
 ||geobeacon.ign.com^
 ||geobytes.com^
+||geocode.usefomo.com^
 ||geocompteur.com^
 ||geocontatore.com^
 ||geocounter.net^
@@ -58715,6 +58702,7 @@
 ||interaktiv-net.de^
 ||interbasepicturespostman.com^
 ||interbasewhirlwindwalrus.com^
+||intercede77.com^
 ||interceptfarrierreap.com^
 ||interceptum.com^
 ||interclick.com^
@@ -63022,7 +63010,6 @@
 ||kmspi.co^
 ||kmspico.io^
 ||kmspico.ws^
-||kmspicoofficial.com^
 ||kmtx.io^
 ||kmuedwvaezote.online^
 ||kmurwyixudezb.space^
@@ -68652,6 +68639,7 @@
 ||lzaussxps.com^
 ||lzbepgwrqyfpv.online^
 ||lzbgekdtxse.com^
+||lzcr41vbp.com^
 ||lzcwbt.schuhcenter.de^
 ||lzdjxp.icu^
 ||lzduxwzbqqlyx.space^
@@ -80063,7 +80051,6 @@
 ||norex-app.paihealth.no^
 ||norfotball.com^
 ||norgefotball.com^
-||norgeshoes.com^
 ||noritobaldy.qpon^
 ||norm0care.com^
 ||norma-external-collect.meizu.com^
@@ -84298,6 +84285,7 @@
 ||pahvqfbuhofly.online^
 ||pahwteqceoxrb.space^
 ||paidcomparatively.com^
+||paidjourneys.com^
 ||paidonresults.net^
 ||pailcrime.com^
 ||pailpatch.com^
@@ -85892,6 +85880,7 @@
 ||pfedhnufaills.site^
 ||pffmpgvrc.com^
 ||pfg.plateful.co^
+||pfh01c50p.com^
 ||pfhnrxinmndvx.site^
 ||pfivvdqcuvmig.space^
 ||pfivwhdsliscy.online^
@@ -104660,6 +104649,7 @@
 ||specialtypin.com^
 ||specialworld.com.au^
 ||speciedecerp.com^
+||speciesjewelry.com^
 ||specific-property.pro^
 ||specificallycries.com^
 ||specificallyfollowsbraid.com^
@@ -106144,6 +106134,7 @@
 ||stableapp.net^
 ||stableaspect.com^
 ||stabledkindler.com^
+||stableparty.com^
 ||stablestaipans.cyou^
 ||stabsrunner.com^
 ||staceydodge.com^
@@ -112785,6 +112776,7 @@
 ||tfzzy4objtvy6.hlzn71bh261zzgrtx8vklvgp3q.cyou^
 ||tg.1155t.cn^
 ||tg.bwc178.com^
+||tg.finance.ua^
 ||tg.m.37.com^
 ||tg.meitu.com^
 ||tg.minfin.com.ua^
