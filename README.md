@@ -2,7 +2,7 @@
 
 三档可选聚合黑名单：**Base（精简）** / **Pro（平衡）** / **Full（全面）**。
 
-> 上次更新: 2026-11-21 02:22:15 (北京时间)
+> 上次更新: 2026-11-21 10:55:07 (北京时间)
 
 ---
 
@@ -10,9 +10,9 @@
 
 | 档位 | GitHub 订阅 | 镜像订阅（国内推荐） | 域名规则 |
 |------|------------|---------------------|----------|
-| **Base** | `https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules-base.txt` | `https://cdn.jsdelivr.net/gh/Alan08Xb/adguard-home-rules@main/rules-base.txt` | 134,022 |
-| **Pro** | `https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules-pro.txt` | `https://cdn.jsdelivr.net/gh/Alan08Xb/adguard-home-rules@main/rules-pro.txt` | 288,474 |
-| **Full** | `https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules-full.txt` | `https://cdn.jsdelivr.net/gh/Alan08Xb/adguard-home-rules@main/rules-full.txt` | 602,965 |
+| **Base** | `https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules-base.txt` | `https://cdn.jsdelivr.net/gh/Alan08Xb/adguard-home-rules@main/rules-base.txt` | 134,085 |
+| **Pro** | `https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules-pro.txt` | `https://cdn.jsdelivr.net/gh/Alan08Xb/adguard-home-rules@main/rules-pro.txt` | 288,580 |
+| **Full** | `https://raw.githubusercontent.com/Alan08Xb/adguard-home-rules/main/rules-full.txt` | `https://cdn.jsdelivr.net/gh/Alan08Xb/adguard-home-rules@main/rules-full.txt` | 603,294 |
 
 > 国内访问 GitHub 慢/失败时，请使用镜像订阅（jsDelivr CDN）。
 
